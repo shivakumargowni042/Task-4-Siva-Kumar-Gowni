@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}DecodeLabs — Settings{% endblock %}
+
+{% block nerve_rail %}{% endblock %}
+
+{% block nav %}
+<div class="app-header">
+  <a href="/" class="app-logo">
+    <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="DecodeLabs">
+    DecodeLabs Toolkit
+  </a>
+  <div class="user-info">
+    <a href="/app" class="btn btn-ghost">← Toolkit</a>
+    <span>👤 {{ user }}</span>
+    <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">🌙</button>
+    <a href="/logout" class="btn btn-ghost">Logout</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="app-page">
+  <div class="app-container" style="max-width:720px;margin:0 auto;padding:32px 24px;">
+    <h2 style="font-size:1.5rem;color:var(--dark-green);margin-bottom:8px;">⚙ Settings</h2>
+    <p style="color:var(--gray);font-size:0.9rem;margin-bottom:32px;">Customize your default preferences for the recognition toolkit.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="glass-card">
+      <form method="POST">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <div class="preprocess-grid">
+          <div class="preprocess-group">
+            <label>Default Mode</label>
+            <select name="default_mode" id="defaultMode">
+              <option value="ocr" {{ 'selected' if settings.default_mode == 'ocr' }}>OCR — Text Recognition</option>
+              <option value="detection" {{ 'selected' if settings.default_mode == 'detection' }}>Object Detection</option>
+              <option value="barcode" {{ 'selected' if settings.default_mode == 'barcode' }}>Barcode / QR Detection</option>
+            </select>
+          </div>
+
+          <div class="preprocess-group toggle-group">
+            <label>Grayscale</label>
+            <label class="toggle-switch">
+              <input type="checkbox" name="grayscale" {{ 'checked' if settings.default_grayscale }}>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="preprocess-group toggle-group">
+            <label>Deskew</label>
+            <label class="toggle-switch">
+              <input type="checkbox" name="deskew" {{ 'checked' if settings.default_deskew }}>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="preprocess-group">
+            <label>Blur Kernel</label>
+            <input type="range" name="blur_kernel" min="1" max="31" step="2"
+                   value="{{ settings.default_blur_kernel or 5 }}"
+                   oninput="document.getElementById('blurVal').textContent=this.value">
+            <div class="range-value" id="blurVal">{{ settings.default_blur_kernel or 5 }}</div>
+          </div>
+
+          <div class="preprocess-group">
+            <label>Threshold Method</label>
+            <select name="threshold_method">
+              <option value="otsu" {{ 'selected' if (settings.default_threshold_method or 'otsu') == 'otsu' }}>Otsu</option>
+              <option value="adaptive" {{ 'selected' if settings.default_threshold_method == 'adaptive' }}>Adaptive</option>
+              <option value="binary" {{ 'selected' if settings.default_threshold_method == 'binary' }}>Binary</option>
+            </select>
+          </div>
+
+          <div class="preprocess-group">
+            <label>Block Size (Adaptive)</label>
+            <input type="range" name="threshold_block" min="3" max="31" step="2"
+                   value="{{ settings.default_threshold_block or 11 }}"
+                   oninput="document.getElementById('blockVal').textContent=this.value">
+            <div class="range-value" id="blockVal">{{ settings.default_threshold_block or 11 }}</div>
+          </div>
+
+          <div class="preprocess-group">
+            <label>C Value (Adaptive)</label>
+            <input type="range" name="threshold_c" min="1" max="10" step="1"
+                   value="{{ settings.default_threshold_c or 2 }}"
+                   oninput="document.getElementById('cVal').textContent=this.value">
+            <div class="range-value" id="cVal">{{ settings.default_threshold_c or 2 }}</div>
+          </div>
+
+          <div class="preprocess-group">
+            <label>OCR Language</label>
+            <select name="lang">
+              {% for code, name in lang_map.items() %}
+              <option value="{{ code }}" {{ 'selected' if (settings.default_lang or 'eng') == code }}>{{ name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="preprocess-group">
+            <label>OCR PSM Mode</label>
+            <select name="psm">
+              {% for code, name in psm_map.items() %}
+              <option value="{{ code }}" {{ 'selected' if (settings.default_psm or '6') == code }}>{{ name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="preprocess-group">
+            <label>Brightness</label>
+            <input type="range" name="brightness" min="-100" max="100" step="1"
+                   value="{{ settings.default_brightness or 0 }}"
+                   oninput="document.getElementById('brightnessVal').textContent=this.value">
+            <div class="range-value" id="brightnessVal">{{ settings.default_brightness or 0 }}</div>
+          </div>
+
+          <div class="preprocess-group">
+            <label>Contrast</label>
+            <input type="range" name="contrast" min="-100" max="100" step="1"
+                   value="{{ settings.default_contrast or 0 }}"
+                   oninput="document.getElementById('contrastVal').textContent=this.value">
+            <div class="range-value" id="contrastVal">{{ settings.default_contrast or 0 }}</div>
+          </div>
+        </div>
+
+        <div style="margin-top:28px;display:flex;gap:12px;">
+          <button type="submit" class="btn btn-primary">💾 Save Settings</button>
+          <a href="/app" class="btn btn-outline">← Back to Toolkit</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Account Info -->
+    <div class="glass-card" style="margin-top:24px;">
+      <h4 style="font-size:0.85rem;color:var(--gray);margin-bottom:12px;">Account</h4>
+      <p style="font-size:0.9rem;color:var(--charcoal);">Logged in as <strong>{{ user }}</strong></p>
+      <div class="form-group" style="margin-top:12px;">
+        <label for="emailInput">Email</label>
+        <div style="display:flex;gap:8px;">
+          <input type="email" id="emailInput" value="{{ settings.email or '' }}" placeholder="your@email.com" style="flex:1;">
+          <button class="btn btn-primary" id="updateEmailBtn" style="white-space:nowrap;padding:10px 16px;">Update</button>
+        </div>
+        <div id="emailStatus" style="font-size:0.8rem;margin-top:4px;"></div>
+      </div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--light-gray);display:flex;gap:12px;flex-wrap:wrap;">
+        <a href="/change_password" class="btn btn-ghost" style="color:var(--dark-green);">🔑 Change Password</a>
+        <a href="/logout" class="btn btn-ghost" style="color:var(--coral);">🚪 Sign Out</a>
+        <button class="btn btn-ghost" id="deleteAccountBtn" style="color:var(--coral);border-color:var(--coral);">🗑 Delete Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

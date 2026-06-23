@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}DecodeLabs — Industrial Training Kit{% endblock %}</title>
+  <link rel="icon" href="{{ url_for('static', filename='img/logo.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body>
+  {% block nav %}{% endblock %}
+
+  {% block nerve_rail %}
+  <div class="nerve-rail">
+    <div class="nerve-rail-line">
+      <div class="nerve-rail-dot"></div>
+    </div>
+    <div class="nerve-rail-node"></div>
+    <div class="nerve-rail-node"></div>
+    <div class="nerve-rail-node"></div>
+    <div class="nerve-rail-node"></div>
+  </div>
+  {% endblock %}
+
+  {% block content %}{% endblock %}
+
+  {% block footer %}
+  <footer>
+    <div class="footer-logo">
+      <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="DecodeLabs">
+      <span>DecodeLabs</span>
+    </div>
+    <div>&copy; 2026 DecodeLabs — Industrial Training Kit, Batch 2026</div>
+  </footer>
+  {% endblock %}
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% block title %}DecodeLabs — Image &amp; Text Recognition Toolkit{% endblock %}
+
+{% block nerve_rail %}{% endblock %}
+
+{% block nav %}
+<div class="app-header">
+  <a href="/" class="app-logo">
+    <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="DecodeLabs">
+    DecodeLabs Toolkit
+  </a>
+  <div class="user-info">
+    <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">🌙</button>
+    <span>👤 {{ user }}</span>
+    <a href="/dashboard" class="btn btn-ghost">📊 Dashboard</a>
+    <a href="/settings" class="btn btn-ghost">⚙ Settings</a>
+    <a href="/logout" class="btn btn-ghost">Logout</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="app-page">
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <h4>Run History</h4>
+        <div class="history-list" id="historyList"></div>
+        <div class="history-empty" id="historyEmpty">No runs yet.<br>Upload an image to start.</div>
+        <button class="btn-load-more" id="loadMoreHistory">Load More</button>
+        <button class="btn-clear-history" id="clearHistory">Clear History</button>
+      </div>
+      <div class="sidebar-card">
+        <h4>About</h4>
+        <p style="font-size:0.82rem;color:var(--gray);line-height:1.6;">
+          Project 4 — Optional Mastery Phase.<br>
+          Build the machine's optic nerve with OCR, Object Detection, or Barcode/QR scanning.
+        </p>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--light-gray);font-size:0.78rem;color:var(--gray);">
+          Min. confidence: <strong style="color:var(--amber)">≥80%</strong>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <div class="glass-card" style="padding:20px 24px;">
+        <!-- Mode Tabs -->
+        <div class="mode-tabs">
+          <button class="mode-tab active" data-mode="ocr">🔤 OCR — Text Recognition</button>
+          <button class="mode-tab" data-mode="detection">🎯 Object Detection</button>
+          <button class="mode-tab" data-mode="barcode">📶 Barcode / QR</button>
+        </div>
+
+        <!-- Upload Zone -->
+        <div class="upload-zone" id="uploadZone">
+          <span class="icon">📁</span>
+          <h3>Upload an image</h3>
+          <p>Drag &amp; drop or click to browse</p>
+          <input type="file" id="fileInput" accept="image/*">
+
+          <div class="upload-options">
+            <button class="upload-option-btn" id="webcamBtn">📷 Camera</button>
+            <button class="upload-option-btn" id="batchBtn">📦 Batch Upload</button>
+          </div>
+          <input type="file" id="batchInput" accept="image/*" multiple style="display:none">
+        </div>
+
+        <!-- Webcam -->
+        <div class="webcam-section" id="webcamSection">
+          <video class="webcam-preview" id="webcamVideo" autoplay playsinline></video>
+          <div class="webcam-actions">
+            <button class="webcam-btn capture" id="captureBtn">📸 Capture</button>
+            <button class="webcam-btn stop" id="closeWebcam">✕ Close</button>
+          </div>
+        </div>
+
+        <!-- Preprocessing -->
+        <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <button class="toggle-preprocess" id="togglePreprocess">⚙ Show Preprocessing</button>
+          <div class="preset-controls">
+            <select class="preset-select" id="presetSelect">
+              <option value="">Load Preset...</option>
+            </select>
+            <button class="preset-btn" id="savePreset">💾 Save</button>
+            <button class="preset-btn" id="deletePreset">🗑 Delete</button>
+          </div>
+        </div>
+
+        <div class="preprocess-panel" id="preprocessPanel">
+          <div class="preprocess-header"><h4>Pre-processing Settings</h4></div>
+          <div class="preprocess-grid">
+            <div class="preprocess-group toggle-group">
+              <label>Grayscale</label>
+              <label class="toggle-switch">
+                <input type="checkbox" id="grayscaleToggle" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="preprocess-group toggle-group">
+              <label>Deskew</label>
+              <label class="toggle-switch">
+                <input type="checkbox" id="deskewToggle" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="preprocess-group">
+              <label>Blur Kernel</label>
+              <input type="range" id="blurKernel" min="1" max="31" step="2" value="5" data-display="blurDisplay">
+              <div class="range-value" id="blurDisplay">5</div>
+            </div>
+            <div class="preprocess-group" id="thresholdGroup">
+              <label>Threshold Method</label>
+              <select id="thresholdMethod">
+                <option value="otsu">Otsu</option>
+                <option value="adaptive">Adaptive</option>
+                <option value="binary">Binary</option>
+              </select>
+            </div>
+            <div class="preprocess-group" id="thresholdBlockGroup">
+              <label>Block Size (Adaptive)</label>
+              <input type="range" id="thresholdBlock" min="3" max="31" step="2" value="11" data-display="blockDisplay">
+              <div class="range-value" id="blockDisplay">11</div>
+            </div>
+            <div class="preprocess-group" id="thresholdCGroup">
+              <label>C Value (Adaptive)</label>
+              <input type="range" id="thresholdC" min="1" max="10" step="1" value="2" data-display="cDisplay">
+              <div class="range-value" id="cDisplay">2</div>
+            </div>
+            <!-- Language (OCR only) -->
+            <div class="preprocess-group" id="langGroup">
+              <label>OCR Language</label>
+              <select id="ocrLang">
+                {% for code, name in lang_map.items() %}
+                <option value="{{ code }}">{{ name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <!-- PSM Mode (OCR only) -->
+            <div class="preprocess-group" id="psmGroup">
+              <label>OCR PSM Mode</label>
+              <select id="ocrPsm">
+                {% for code, name in psm_map.items() %}
+                <option value="{{ code }}">{{ name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <!-- Rotation -->
+            <div class="preprocess-group">
+              <label>Rotation</label>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <button type="button" class="webcam-btn capture" id="rotateLeft" style="padding:6px 12px;font-size:0.8rem;">↺ 90°</button>
+                <button type="button" class="webcam-btn capture" id="rotateRight" style="padding:6px 12px;font-size:0.8rem;">↻ 90°</button>
+                <input type="hidden" id="rotationInput" value="">
+              </div>
+            </div>
+            <!-- Brightness -->
+            <div class="preprocess-group">
+              <label>Brightness</label>
+              <input type="range" id="brightness" min="-100" max="100" step="1" value="0" data-display="brightnessDisplay">
+              <div class="range-value" id="brightnessDisplay">0</div>
+            </div>
+            <!-- Contrast -->
+            <div class="preprocess-group">
+              <label>Contrast</label>
+              <input type="range" id="contrast" min="-100" max="100" step="1" value="0" data-display="contrastDisplay">
+              <div class="range-value" id="contrastDisplay">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="preview-area" id="previewArea">
+        <div class="glass-card">
+          <h4 style="font-size:0.9rem;color:var(--gray);margin-bottom:14px;">📸 Image Preview</h4>
+          <div class="preview-grid">
+            <div class="preview-card">
+              <div class="preview-label">Original</div>
+              <img class="preview-image" id="originalImg" src="" alt="Original">
+            </div>
+            <div class="preview-card">
+              <div class="preview-label">Comparison</div>
+              <div class="comparison-container" id="comparisonContainer">
+                <img id="comparisonProcessed" src="" alt="Processed">
+                <div class="comparison-overlay">
+                  <img id="comparisonOriginal" src="" alt="Original">
+                </div>
+                <div class="comparison-handle"></div>
+              </div>
+            </div>
+          </div>
+          <p style="font-size:0.78rem;color:var(--gray);margin-top:8px;">Drag on the comparison image to slide between original and processed.</p>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="result-area" id="resultArea"></div>
+    </main>
+  </div>
+</div>
+
+<!-- Loading -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner spinner-lg"></div>
+  <p>Processing your image...</p>
+</div>
+
+<!-- Clipboard Notification -->
+<div class="clipboard-notification" id="clipboardNotif">📋 Image pasted from clipboard!</div>
+
+<script id="userSettings" type="application/json">
+{{ settings | tojson | safe }}
+</script>
+{% endblock %}

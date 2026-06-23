@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}DecodeLabs — Industrial Training Kit | Project 4{% endblock %}
+
+{% block nav %}
+<nav>
+  <a href="/" class="nav-logo">
+    <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="DecodeLabs">
+    DecodeLabs
+  </a>
+  <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">🌙</button>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#paths">Paths</a></li>
+    <li><a href="#validation">Validation</a></li>
+    {% if session.user %}
+      <li><a href="/dashboard">Dashboard</a></li>
+      <li><a href="/logout" class="btn btn-ghost">Logout</a></li>
+    {% else %}
+      <li><a href="/login" class="btn btn-ghost">Login</a></li>
+      <li><a href="/register" class="btn btn-primary">Get Started</a></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-text">
+      <h1>Where <span>Engineers</span> Are Built</h1>
+      <p class="subtitle">Building the Machine's Optic Nerve — Image &amp; Text Recognition with AI</p>
+      <div class="hero-buttons">
+        {% if session.user %}
+          <a href="/app" class="btn btn-primary">Launch Toolkit</a>
+        {% else %}
+          <a href="/register" class="btn btn-primary">Start Project</a>
+          <a href="#about" class="btn btn-outline">Learn More</a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-logo-large">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+          <defs>
+            <linearGradient id="heroEye" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#4ade80"/>
+              <stop offset="100%" stop-color="#38bdf8"/>
+            </linearGradient>
+            <linearGradient id="heroPupil" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#166534"/>
+              <stop offset="100%" stop-color="#1e3a5f"/>
+            </linearGradient>
+          </defs>
+          <ellipse cx="100" cy="100" rx="65" ry="48" fill="url(#heroEye)" opacity="0.12"/>
+          <ellipse cx="100" cy="100" rx="65" ry="48" stroke="url(#heroEye)" stroke-width="3"/>
+          <circle cx="100" cy="100" r="22" fill="url(#heroPupil)"/>
+          <circle cx="100" cy="100" r="10" fill="#4ade80" opacity="0.8"/>
+          <g stroke="#166534" stroke-width="2.5" fill="none" stroke-linecap="round">
+            <path d="M82 85 Q55 60 30 40" opacity="0.5"/>
+            <path d="M78 92 Q45 75 20 70" opacity="0.4"/>
+            <path d="M82 115 Q55 140 30 160" opacity="0.5"/>
+            <path d="M78 108 Q45 125 20 130" opacity="0.4"/>
+            <path d="M118 85 Q145 60 170 40" opacity="0.5"/>
+            <path d="M122 92 Q155 75 180 70" opacity="0.4"/>
+            <path d="M118 115 Q145 140 170 160" opacity="0.5"/>
+            <path d="M122 108 Q155 125 180 130" opacity="0.4"/>
+          </g>
+          <circle cx="30" cy="40" r="5" fill="#14b8a6"><animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/></circle>
+          <circle cx="20" cy="70" r="4" fill="#f43f5e"><animate attributeName="opacity" values="0.6;1;0.6" dur="2.5s" repeatCount="indefinite"/></circle>
+          <circle cx="30" cy="160" r="5" fill="#f59e0b"><animate attributeName="opacity" values="0.6;1;0.6" dur="1.8s" repeatCount="indefinite"/></circle>
+          <circle cx="20" cy="130" r="4" fill="#a855f7"><animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite"/></circle>
+          <circle cx="170" cy="40" r="5" fill="#14b8a6"><animate attributeName="opacity" values="0.6;1;0.6" dur="2.2s" repeatCount="indefinite"/></circle>
+          <circle cx="180" cy="70" r="4" fill="#f43f5e"><animate attributeName="opacity" values="0.6;1;0.6" dur="2.7s" repeatCount="indefinite"/></circle>
+          <circle cx="170" cy="160" r="5" fill="#f59e0b"><animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" repeatCount="indefinite"/></circle>
+          <circle cx="180" cy="130" r="4" fill="#a855f7"><animate attributeName="opacity" values="0.6;1;0.6" dur="2.8s" repeatCount="indefinite"/></circle>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- About / Blueprint Section -->
+<section class="blueprint-section" id="about" data-section="about">
+  <div class="corner-markers">
+    <div class="marker marker-tl"></div>
+    <div class="marker marker-tr"></div>
+    <div class="marker marker-bl"></div>
+    <div class="marker marker-br"></div>
+  </div>
+  <h2 class="section-title">The Architect's Playbook</h2>
+  <p class="section-subtitle">Project 4 — Optional Mastery Phase: from structured data to raw vision.</p>
+  <div class="info-grid">
+    <div class="info-card">
+      <h3>📡 The New Frontier</h3>
+      <p>Over <strong>80% of enterprise data</strong> is unstructured — raw images, scanned documents, and video feeds. This project bridges the gap between structured spreadsheets and the visual world.</p>
+      <div style="margin-top:20px">
+        <div class="stat">80%+</div>
+        <div class="stat-label">of enterprise data is unstructured</div>
+      </div>
+    </div>
+    <div class="info-card">
+      <h3>🧠 Building the Optic Nerve</h3>
+      <p>Teach machines to "see." Choose your path — extract readable text from images with <strong>OCR</strong>, or detect objects in real-time with <strong>MobileNet-SSD</strong>.</p>
+      <div style="margin-top:20px">
+        <div class="stat">≥80%</div>
+        <div class="stat-label">minimum confidence score required</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Paths Section -->
+<section class="paths-section" id="paths" data-section="paths">
+  <h2 class="section-title">Choose Your Path</h2>
+  <p class="section-subtitle">Both paths simulate real-world AI engineering — pick the one that matches your focus.</p>
+  <div class="paths-grid">
+    <div class="path-card">
+      <div class="path-icon">🔤</div>
+      <h3>Path 1 — OCR</h3>
+      <p>Use <strong>pytesseract</strong> (Google's Tesseract engine) to extract readable text from images. Pre-process with grayscale, Gaussian blur, and deskewing for maximum accuracy.</p>
+      <span class="tag">Text Recognition</span>
+    </div>
+    <div class="path-card">
+      <div class="path-icon">🎯</div>
+      <h3>Path 2 — Object Detection</h3>
+      <p>Use <strong>OpenCV + MobileNet-SSD</strong> to identify and draw bounding boxes around objects. Pre-process images into a 4D blob and output (X, Y, W, H) coordinates.</p>
+      <span class="tag">Computer Vision</span>
+    </div>
+  </div>
+</section>
+
+<!-- Validation Section -->
+<section class="validation-section" id="validation" data-section="validation">
+  <h2 class="section-title">Validation Gate</h2>
+  <p class="section-subtitle">Four checks your pipeline must pass before it ships.</p>
+  <div class="validation-criteria">
+    <div class="criterion">
+      <div class="check">1</div>
+      <div>
+        <h4>Library Integration</h4>
+        <p>Tesseract / OpenCV correctly installed and importable</p>
+      </div>
+    </div>
+    <div class="criterion">
+      <div class="check">2</div>
+      <div>
+        <h4>Pre-processing Integrity</h4>
+        <p>Image is properly grayscaled, blurred, and deskewed</p>
+      </div>
+    </div>
+    <div class="criterion">
+      <div class="check">3</div>
+      <div>
+        <h4>Accuracy Benchmarking</h4>
+        <p>Output meets the 80% confidence threshold</p>
+      </div>
+    </div>
+    <div class="criterion">
+      <div class="check">4</div>
+      <div>
+        <h4>Visual Confirmation</h4>
+        <p>Clean output image or extracted text string</p>
+      </div>
+    </div>
+    <div class="confidence-gate">
+      <div class="percent">80%</div>
+      <p>Minimum confidence score required to pass validation</p>
+    </div>
+  </div>
+</section>
+
+<!-- Closing -->
+<section class="closing-section" data-section="close">
+  <h2>Ready to Build?</h2>
+  <p>You've earned your certificate. This is the Optional Mastery Phase — prove you can work with real-world AI.</p>
+  {% if session.user %}
+    <a href="/app" class="btn btn-primary">Launch Toolkit</a>
+  {% else %}
+    <a href="/register" class="btn btn-primary">Get Started</a>
+  {% endif %}
+</section>
+{% endblock %}

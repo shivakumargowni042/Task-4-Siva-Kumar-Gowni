@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="eyeGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4ade80"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <linearGradient id="pupilGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#166534"/>
+      <stop offset="100%" stop-color="#1e3a5f"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer eye shape -->
+  <ellipse cx="100" cy="100" rx="55" ry="40" fill="url(#eyeGrad)" opacity="0.15"/>
+  <ellipse cx="100" cy="100" rx="55" ry="40" stroke="url(#eyeGrad)" stroke-width="3"/>
+
+  <!-- Pupil / Core -->
+  <circle cx="100" cy="100" r="18" fill="url(#pupilGrad)"/>
+  <circle cx="100" cy="100" r="8" fill="#4ade80" opacity="0.8"/>
+
+  <!-- Nerve branches extending from pupil - left side -->
+  <g stroke="#166534" stroke-width="2" fill="none" stroke-linecap="round">
+    <!-- Left upper -->
+    <path d="M85 88 Q65 70 45 55" opacity="0.7"/>
+    <path d="M82 92 Q55 80 30 75" opacity="0.6"/>
+    <!-- Left lower -->
+    <path d="M85 112 Q65 130 45 145" opacity="0.7"/>
+    <path d="M82 108 Q55 120 30 125" opacity="0.6"/>
+    <!-- Right upper -->
+    <path d="M115 88 Q135 70 155 55" opacity="0.7"/>
+    <path d="M118 92 Q145 80 170 75" opacity="0.6"/>
+    <!-- Right lower -->
+    <path d="M115 112 Q135 130 155 145" opacity="0.7"/>
+    <path d="M118 108 Q145 120 170 125" opacity="0.6"/>
+  </g>
+
+  <!-- Data-node dots at nerve endpoints -->
+  <!-- Teal dot -->
+  <circle cx="45" cy="55" r="4" fill="#14b8a6">
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <!-- Coral dot -->
+  <circle cx="30" cy="75" r="3" fill="#f43f5e">
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+  <!-- Amber dot -->
+  <circle cx="45" cy="145" r="4" fill="#f59e0b">
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="1.8s" repeatCount="indefinite"/>
+  </circle>
+  <!-- Violet dot -->
+  <circle cx="30" cy="125" r="3" fill="#a855f7">
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <!-- Teal right -->
+  <circle cx="155" cy="55" r="4" fill="#14b8a6">
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="2.2s" repeatCount="indefinite"/>
+  </circle>
+  <!-- Coral right -->
+  <circle cx="170" cy="75" r="3" fill="#f43f5e">
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="2.7s" repeatCount="indefinite"/>
+  </circle>
+  <!-- Amber right -->
+  <circle cx="155" cy="145" r="4" fill="#f59e0b">
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+  <!-- Violet right -->
+  <circle cx="170" cy="125" r="3" fill="#a855f7">
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="2.8s" repeatCount="indefinite"/>
+  </circle>
+</svg>

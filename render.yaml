@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: decodelabs
+    runtime: docker
+    repo: https://github.com/shivakumargowni042/Task-4-Siva-Kumar-Gowni
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FLASK_ENV
+        value: production

@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+{% block title %}DecodeLabs — Dashboard{% endblock %}
+
+{% block nerve_rail %}{% endblock %}
+
+{% block nav %}
+<div class="app-header">
+  <a href="/" class="app-logo">
+    <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="DecodeLabs">
+    DecodeLabs
+  </a>
+  <div class="user-info">
+    <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">🌙</button>
+    <span>👤 {{ user }}</span>
+    <a href="/app" class="btn btn-ghost">🔤 Toolkit</a>
+    <a href="/settings" class="btn btn-ghost">⚙ Settings</a>
+    <a href="/logout" class="btn btn-ghost">Logout</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dash-page">
+  <div class="dash-container">
+    <!-- Header -->
+    <div class="dash-header">
+      <div>
+        <h2 class="dash-title">📊 Dashboard</h2>
+        <p class="dash-subtitle">Your Project 4 — Mastery Phase performance overview</p>
+      </div>
+      <a href="/app" class="btn btn-primary">🚀 Launch Toolkit</a>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="dash-grid">
+      <div class="dash-card dash-card-mint">
+        <div class="dash-card-glow"></div>
+        <div class="dash-card-icon-wrap">📦</div>
+        <div class="dash-card-body">
+          <div class="dash-card-value" data-value="{{ data.total_runs }}">{{ data.total_runs }}</div>
+          <div class="dash-card-label">Total Runs</div>
+        </div>
+      </div>
+      <div class="dash-card dash-card-blue">
+        <div class="dash-card-glow"></div>
+        <div class="dash-card-icon-wrap">🎯</div>
+        <div class="dash-card-body">
+          <div class="dash-card-value" data-value="{{ "%.1f"|format(data.avg_confidence) }}" data-suffix="%">{{ "%.1f"|format(data.avg_confidence) }}%</div>
+          <div class="dash-card-label">Avg Confidence</div>
+        </div>
+      </div>
+      <div class="dash-card dash-card-amber">
+        <div class="dash-card-glow"></div>
+        <div class="dash-card-icon-wrap">✅</div>
+        <div class="dash-card-body">
+          <div class="dash-card-value" data-value="{{ "%.1f"|format(data.pass_rate) }}" data-suffix="%">{{ "%.1f"|format(data.pass_rate) }}%</div>
+          <div class="dash-card-label">Pass Rate</div>
+        </div>
+      </div>
+      <div class="dash-card dash-card-violet">
+        <div class="dash-card-glow"></div>
+        <div class="dash-card-icon-wrap">🖼</div>
+        <div class="dash-card-body">
+          <div class="dash-card-value" data-value="{{ data.ocr_count + data.detection_count + data.barcode_count }}">{{ data.ocr_count + data.detection_count + data.barcode_count }}</div>
+          <div class="dash-card-label">Images Processed</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="dash-charts">
+      <!-- Mode Split -->
+      <div class="dash-chart-card">
+        <div class="dash-chart-header">
+          <h4>🔤 vs 🎯</h4>
+          <span class="dash-chart-badge">Mode Split</span>
+        </div>
+        {% set total_mode = data.ocr_count + data.detection_count + data.barcode_count %}
+        {% set ocr_pct = (data.ocr_count / total_mode * 100)|round(1) if total_mode else 0 %}
+        {% set det_pct = (data.detection_count / total_mode * 100)|round(1) if total_mode else 0 %}
+        {% set bar_pct = (data.barcode_count / total_mode * 100)|round(1) if total_mode else 0 %}
+        <div class="dash-chart-body">
+          <div class="dash-bar-group">
+            <div class="dash-bar-row">
+              <span class="dash-bar-label">🔤 OCR</span>
+              <span class="dash-bar-count">{{ data.ocr_count }}</span>
+            </div>
+            <div class="dash-bar-track">
+              <div class="dash-bar-fill dash-bar-mint" style="width:{{ ocr_pct }}%" data-width="{{ ocr_pct }}%"></div>
+            </div>
+            <div class="dash-bar-row">
+              <span class="dash-bar-label">🎯 Detection</span>
+              <span class="dash-bar-count">{{ data.detection_count }}</span>
+            </div>
+            <div class="dash-bar-track">
+              <div class="dash-bar-fill dash-bar-coral" style="width:{{ det_pct }}%" data-width="{{ det_pct }}%"></div>
+            </div>
+            <div class="dash-bar-row">
+              <span class="dash-bar-label">📶 Barcode</span>
+              <span class="dash-bar-count">{{ data.barcode_count }}</span>
+            </div>
+            <div class="dash-bar-track">
+              <div class="dash-bar-fill dash-bar-violet" style="width:{{ bar_pct }}%" data-width="{{ bar_pct }}%"></div>
+            </div>
+          </div>
+          <div class="dash-donut-wrap">
+            <svg viewBox="0 0 120 120" class="dash-donut-svg">
+              <defs>
+                <linearGradient id="mintGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4ade80"/><stop offset="100%" stop-color="#38bdf8"/></linearGradient>
+                <linearGradient id="coralGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f43f5e"/><stop offset="100%" stop-color="#fb7185"/></linearGradient>
+                <linearGradient id="amberGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#f97316"/></linearGradient>
+                <linearGradient id="violetGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#c084fc"/></linearGradient>
+              </defs>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="var(--light-gray)" stroke-width="10"/>
+              <circle class="dash-donut-ring" cx="60" cy="60" r="50" fill="none" stroke="url(#mintGrad)" stroke-width="10"
+                stroke-dasharray="{{ ocr_pct / 100 * 314 }} {{ 314 - ocr_pct / 100 * 314 }}"
+                stroke-linecap="round" transform="rotate(-90 60 60)"/>
+              <circle class="dash-donut-ring" cx="60" cy="60" r="50" fill="none" stroke="url(#coralGrad)" stroke-width="10"
+                stroke-dasharray="{{ det_pct / 100 * 314 }} {{ 314 - det_pct / 100 * 314 }}"
+                stroke-dashoffset="{{ '-' ~ (ocr_pct / 100 * 314) }}"
+                stroke-linecap="round" transform="rotate(-90 60 60)"/>
+              <circle class="dash-donut-ring" cx="60" cy="60" r="50" fill="none" stroke="url(#violetGrad)" stroke-width="10"
+                stroke-dasharray="{{ bar_pct / 100 * 314 }} {{ 314 - bar_pct / 100 * 314 }}"
+                stroke-dashoffset="{{ '-' ~ ((ocr_pct + det_pct) / 100 * 314) }}"
+                stroke-linecap="round" transform="rotate(-90 60 60)"/>
+              <text x="60" y="50" text-anchor="middle" font-size="16" font-weight="800" fill="var(--charcoal)">{{ ocr_pct|int }}%</text>
+              <text x="60" y="66" text-anchor="middle" font-size="8" fill="var(--gray)">OCR</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pass/Fail -->
+      <div class="dash-chart-card">
+        <div class="dash-chart-header">
+          <h4>✅ vs ❌</h4>
+          <span class="dash-chart-badge">Validation</span>
+        </div>
+        {% set fail_pct = (data.failed / data.total_runs * 100)|round(1) if data.total_runs else 0 %}
+        <div class="dash-chart-body">
+          <div class="dash-bar-group">
+            <div class="dash-bar-row">
+              <span class="dash-bar-label">✅ Passed</span>
+              <span class="dash-bar-count">{{ data.passed }}</span>
+            </div>
+            <div class="dash-bar-track">
+              <div class="dash-bar-fill dash-bar-mint" style="width:{{ data.pass_rate }}%" data-width="{{ data.pass_rate }}%"></div>
+            </div>
+            <div class="dash-bar-row">
+              <span class="dash-bar-label">❌ Failed</span>
+              <span class="dash-bar-count">{{ data.failed }}</span>
+            </div>
+            <div class="dash-bar-track">
+              <div class="dash-bar-fill dash-bar-coral" style="width:{{ fail_pct }}%" data-width="{{ fail_pct }}%"></div>
+            </div>
+          </div>
+          <div class="dash-donut-wrap">
+            <svg viewBox="0 0 120 120" class="dash-donut-svg">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="var(--light-gray)" stroke-width="10"/>
+              <circle class="dash-donut-ring" cx="60" cy="60" r="50" fill="none" stroke="url(#mintGrad)" stroke-width="10"
+                stroke-dasharray="{{ data.pass_rate / 100 * 314 }} {{ 314 - data.pass_rate / 100 * 314 }}"
+                stroke-linecap="round" transform="rotate(-90 60 60)"/>
+              <circle class="dash-donut-ring" cx="60" cy="60" r="50" fill="none" stroke="url(#coralGrad)" stroke-width="10"
+                stroke-dasharray="{{ fail_pct / 100 * 314 }} {{ 314 - fail_pct / 100 * 314 }}"
+                stroke-dashoffset="{{ '-' ~ (data.pass_rate / 100 * 314) }}"
+                stroke-linecap="round" transform="rotate(-90 60 60)"/>
+              <text x="60" y="56" text-anchor="middle" font-size="22" font-weight="800" fill="var(--charcoal)">{{ data.pass_rate|int }}%</text>
+              <text x="60" y="74" text-anchor="middle" font-size="10" fill="var(--gray)">Pass</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Row -->
+    <div class="dash-bottom">
+      <!-- Recent Activity -->
+      <div class="dash-activity-card">
+        <div class="dash-chart-header">
+          <h4>⏱ Recent Activity</h4>
+          <span class="dash-chart-badge">{{ data.recent|length }} runs</span>
+        </div>
+        {% if data.recent %}
+          <div class="dash-activity-list">
+            {% for item in data.recent %}
+              <div class="dash-activity-item">
+                <div class="dash-activity-dot {{ 'pass' if item.passed else 'fail' }}"></div>
+                <div class="dash-activity-icon">{{ '🔤' if item.mode == 'ocr' else ('🎯' if item.mode == 'detection' else '📶') }}</div>
+                <div class="dash-activity-body">
+                  <div class="dash-activity-name">{{ item.filename }}</div>
+                  <div class="dash-activity-meta">{{ item.mode|upper }} · {{ item.timestamp }}</div>
+                </div>
+                <div class="dash-activity-conf {{ 'pass' if item.passed else 'fail' }}">{{ item.confidence }}%</div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="dash-empty">
+            <div class="dash-empty-icon">📊</div>
+            <p class="dash-empty-title">No activity yet</p>
+            <p style="font-size:0.85rem;color:var(--gray);margin-bottom:16px;">Run some images through the toolkit to see your stats.</p>
+            <a href="/app" class="btn btn-primary">🚀 Start Now</a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="dash-actions-card">
+        <div class="dash-chart-header">
+          <h4>⚡ Quick Actions</h4>
+          <span class="dash-chart-badge">Shortcuts</span>
+        </div>
+        <div class="dash-actions-grid">
+          <a href="/app" class="dash-action-btn">
+            <span class="dash-action-icon" style="background:rgba(74,222,128,0.15);">🔤</span>
+            <span class="dash-action-label">New OCR</span>
+          </a>
+          <a href="/app" class="dash-action-btn">
+            <span class="dash-action-icon" style="background:rgba(244,67,94,0.12);">🎯</span>
+            <span class="dash-action-label">New Detection</span>
+          </a>
+          <a href="/settings" class="dash-action-btn">
+            <span class="dash-action-icon" style="background:rgba(245,158,11,0.15);">⚙</span>
+            <span class="dash-action-label">Settings</span>
+          </a>
+          <a href="/" class="dash-action-btn">
+            <span class="dash-action-icon" style="background:rgba(168,85,247,0.12);">🏠</span>
+            <span class="dash-action-label">Home</span>
+          </a>
+          <a href="/export_history" class="dash-action-btn">
+            <span class="dash-action-icon" style="background:rgba(20,184,166,0.15);">📥</span>
+            <span class="dash-action-label">Export History</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
